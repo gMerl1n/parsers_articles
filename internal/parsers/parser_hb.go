@@ -79,6 +79,19 @@ func (hb *ParserHB) GetHtmlPage(reqOptions *RequestOpts) (*goquery.Document, err
 
 }
 
-func (hb *ParserHB) GetUrlsArticles() {
+func (hb *ParserHB) GetUrlsArticles(pageHTML *goquery.Document) []string {
+
+	arrayUrls := make([]string, 0)
+
+	// Через цикл получаем ссылки на все статьи с главной страницы
+	pageHTML.Find(".mg-card__title").Each(func(index int, item *goquery.Selection) {
+		url, ok := item.Find(".mg-card__link").Attr("href")
+		if ok {
+			arrayUrls = append(arrayUrls, url)
+		}
+
+	})
+
+	return arrayUrls
 
 }
