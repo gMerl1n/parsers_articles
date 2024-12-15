@@ -1,6 +1,6 @@
 package types
 
-type Articles struct {
+type Article struct {
 	Title   string
 	Author  string
 	Body    string
