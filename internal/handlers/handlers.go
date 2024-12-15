@@ -26,7 +26,7 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Ошибка во время парсинга ссылки в RequestUrl")
 	}
 
-	categoryID, err := h.services.CreateCategory(r.Context(), requestProviderUrl.Url)
+	categoryID, err := h.services.CreateCategory(r.Context(), requestProviderUrl.ProviderSign, requestProviderUrl.Url)
 	if err != nil {
 		fmt.Println("Не удалось отправить ссылку на категорию в сервисы")
 	}
