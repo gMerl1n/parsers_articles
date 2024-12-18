@@ -5,9 +5,9 @@ import (
 )
 
 type Handler struct {
-	services service.Services
+	services *service.Services
 }
 
-func NewHandler(serv service.Services) *Handler {
+func NewHandler(serv *service.Services) *Handler {
 	return &Handler{services: serv}
 }
