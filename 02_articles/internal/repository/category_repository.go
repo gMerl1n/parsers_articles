@@ -33,19 +33,18 @@ func NewCategoryRepo(db *pgxpool.Pool, log *zap.Logger) *CategoryRepo {
 
 func (r *CategoryRepo) CreateCategory(ctx context.Context, name string, url string) (int, error) {
 
-	var category domain.Category
+	var categoryID int
 
-	query := fmt.Sprintf("INSERT INTO %s (ID, name, url) VALUES ($1, $2, $3) RETURNING ID", catTables)
+	query := fmt.Sprintf("INSERT INTO %s (name, url) VALUES ($1, $2) RETURNING id", catTables)
 
 	if err := r.db.QueryRow(ctx, query,
-		category.ID,
-		category.Name,
-		category.Url,
-	).Scan(&category); err != nil {
-		return 0, er.CategoryIsAlready.SetCause(fmt.Sprint(err))
+		name,
+		url,
+	).Scan(&categoryID); err != nil {
+		return 0, er.IncorrectRequest.SetCause(fmt.Sprint(err))
 	}
 
-	return category.ID, nil
+	return categoryID, nil
 
 }
 
