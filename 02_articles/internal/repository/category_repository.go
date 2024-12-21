@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
 )
 
 type StorageCategory interface {
@@ -12,12 +13,14 @@ type StorageCategory interface {
 }
 
 type CategoryRepo struct {
-	db *pgxpool.Pool
+	db     *pgxpool.Pool
+	logger *zap.Logger
 }
 
-func NewCategoryRepo(db *pgxpool.Pool) *CategoryRepo {
+func NewCategoryRepo(db *pgxpool.Pool, log *zap.Logger) *CategoryRepo {
 	return &CategoryRepo{
-		db: db,
+		db:     db,
+		logger: log,
 	}
 }
 
