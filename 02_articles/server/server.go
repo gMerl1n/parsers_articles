@@ -11,18 +11,19 @@ import (
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/service"
 	"github.com/gMerl1on/parsers_articles/02_articles/pkg/db"
 	"github.com/gorilla/mux"
+	"go.uber.org/zap"
 )
 
-func NewHttpServer(ctx context.Context, postgres configs.ConfigPostgres, BindAddr string) (*http.Server, error) {
+func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.ConfigPostgres, BindAddr string) (*http.Server, error) {
 
 	db, err := db.NewPostgresDB(ctx, postgres)
 	if err != nil {
 		fmt.Println("Ошибка инициализации БД")
 	}
 
-	repo := repository.NewRepositories(db)
-	serv := service.NewServices(repo)
-	h := handlers.NewHandler(serv)
+	repo := repository.NewRepositories(db, log)
+	serv := service.NewServices(repo, log)
+	h := handlers.NewHandler(serv, log)
 
 	router := mux.NewRouter()
 

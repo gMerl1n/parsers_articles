@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func initLogger() (*zap.Logger, error) {
+func InitLogger() (*zap.Logger, error) {
 	return zap.Config{
 		Level:            zap.NewAtomicLevelAt(zapcore.InfoLevel),
 		Development:      true,

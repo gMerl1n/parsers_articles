@@ -44,7 +44,7 @@ func RunServer() error {
 
 	// Initialize server, db, routing
 	ctx := context.Background()
-	srv, err := server.NewHttpServer(ctx, config.Postgres, config.Bindaddr)
+	srv, err := server.NewHttpServer(ctx, logger, config.Postgres, config.Bindaddr)
 
 	if err != nil {
 		logger.Fatal("Failed to create HTTP server", zap.Error(err))
