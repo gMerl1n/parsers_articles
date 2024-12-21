@@ -11,9 +11,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gMerl1n/parsers_articles/configs"
-	"github.com/gMerl1n/parsers_articles/server"
+	"github.com/gMerl1on/parsers_articles/02_articles/configs"
+	"github.com/gMerl1on/parsers_articles/02_articles/pkg/logging"
+	"github.com/gMerl1on/parsers_articles/02_articles/server"
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -32,6 +34,11 @@ func RunServer() error {
 		return err
 	}
 
+	logger, err := logging.InitLogger()
+	if err != nil {
+		log.Fatal("Failed to load logger")
+	}
+
 	// Initialize configs
 	config := configs.NewConfig()
 
@@ -40,7 +47,7 @@ func RunServer() error {
 	srv, err := server.NewHttpServer(ctx, config.Postgres, config.Bindaddr)
 
 	if err != nil {
-		fmt.Println("Failed to start server", err.Error())
+		logger.Fatal("Failed to create HTTP server", zap.Error(err))
 		return err
 	}
 
@@ -57,7 +64,7 @@ func RunServer() error {
 		close(stopped)
 	}()
 
-	fmt.Println("starting API Server...")
+	logger.Info("Starting API Server...")
 
 	if err = srv.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 		return err

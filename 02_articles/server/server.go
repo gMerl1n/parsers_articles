@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gMerl1n/parsers_articles/pkg/db"
 	"github.com/gMerl1on/parsers_articles/02_articles/configs"
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/handlers"
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/service"
+	"github.com/gMerl1on/parsers_articles/02_articles/pkg/db"
 	"github.com/gorilla/mux"
 )
 
