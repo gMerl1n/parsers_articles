@@ -3,14 +3,14 @@ package service
 import (
 	"context"
 
+	"github.com/gMerl1on/parsers_articles/02_articles/internal/domain"
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
-	tt "github.com/gMerl1on/parsers_articles/02_articles/internal/types"
 	"go.uber.org/zap"
 )
 
 type ServiceArticles interface {
-	GetArticleByID(ctx context.Context, ID int) (tt.Article, error)
-	GetArticles(ctx context.Context) ([]tt.Article, error)
+	GetArticleByID(ctx context.Context, ID int) (domain.Article, error)
+	GetArticles(ctx context.Context) ([]domain.Article, error)
 }
 
 type ArticlesService struct {
@@ -25,8 +25,8 @@ func NewArticlesSerivce(repo repository.StorageArticles, log *zap.Logger) *Artic
 	}
 }
 
-func (s *ArticlesService) GetArticleByID(ctx context.Context, ID int) (tt.Article, error) {
-	return tt.Article{
+func (s *ArticlesService) GetArticleByID(ctx context.Context, ID int) (domain.Article, error) {
+	return domain.Article{
 		Title:   "title",
 		Author:  "author",
 		Body:    "body",
@@ -34,6 +34,6 @@ func (s *ArticlesService) GetArticleByID(ctx context.Context, ID int) (tt.Articl
 	}, nil
 }
 
-func (s *ArticlesService) GetArticles(ctx context.Context) ([]tt.Article, error) {
+func (s *ArticlesService) GetArticles(ctx context.Context) ([]domain.Article, error) {
 	return nil, nil
 }

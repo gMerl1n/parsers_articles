@@ -3,14 +3,14 @@ package repository
 import (
 	"context"
 
-	tt "github.com/gMerl1on/parsers_articles/02_articles/internal/types"
+	"github.com/gMerl1on/parsers_articles/02_articles/internal/domain"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
 type StorageArticles interface {
-	CreateArticle(ctx context.Context, article tt.Article) (string, error)
-	GetArticles(ctx context.Context) ([]tt.Article, error)
+	CreateArticle(ctx context.Context, article domain.Article) (string, error)
+	GetArticles(ctx context.Context) ([]domain.Article, error)
 }
 
 type ArticleRepo struct {
@@ -25,10 +25,10 @@ func NewArticlesRepo(db *pgxpool.Pool, log *zap.Logger) *ArticleRepo {
 	}
 }
 
-func (r *ArticleRepo) CreateArticle(ctx context.Context, article tt.Article) (string, error) {
+func (r *ArticleRepo) CreateArticle(ctx context.Context, article domain.Article) (string, error) {
 	return "", nil
 }
 
-func (r *ArticleRepo) GetArticles(ctx context.Context) ([]tt.Article, error) {
+func (r *ArticleRepo) GetArticles(ctx context.Context) ([]domain.Article, error) {
 	return nil, nil
 }

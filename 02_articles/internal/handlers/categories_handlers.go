@@ -4,26 +4,35 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/gMerl1on/parsers_articles/02_articles/pkg/errors"
+	"go.uber.org/zap"
 )
 
 func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var requestProviderUrl RequestProviderUrl
+	var categoryRequest CategoryRequest
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&requestProviderUrl); err != nil {
-		fmt.Println("Ошибка во время парсинга ссылки в RequestUrl")
+	if err := json.NewDecoder(r.Body).Decode(&categoryRequest); err != nil {
+		h.logger.Warn("Failed to decode request body category", zap.Error(err))
+		errors.SendHttpError(w, errors.InternalServerError)
+		return
 	}
 
-	categoryID, err := h.services.ServiceCategory.CreateCategory(r.Context(), requestProviderUrl.ProviderSign, requestProviderUrl.Url)
+	categoryID, err := h.services.ServiceCategory.CreateCategory(r.Context(), categoryRequest.Name, categoryRequest.Url)
 	if err != nil {
-		fmt.Println("Не удалось отправить ссылку на категорию в сервисы")
+		h.logger.Warn("Не удалось отправить ссылку на категорию в сервисы", zap.Error(err))
+		errors.SendHttpError(w, err)
+		return
 	}
 
 	marshalledCategoryID, err := json.Marshal(categoryID)
 	if err != nil {
-		fmt.Println("Не получилось make marshal")
+		h.logger.Warn("Не получилось make marshal", zap.Error(err))
+		errors.SendHttpError(w, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

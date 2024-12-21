@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gMerl1on/parsers_articles/02_articles/configs"
@@ -18,7 +17,7 @@ func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.Config
 
 	db, err := db.NewPostgresDB(ctx, postgres)
 	if err != nil {
-		fmt.Println("Ошибка инициализации БД")
+		log.Fatal("Failed to initialize DB")
 	}
 
 	repo := repository.NewRepositories(db, log)
@@ -26,6 +25,9 @@ func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.Config
 	h := handlers.NewHandler(serv, log)
 
 	router := mux.NewRouter()
+
+	// test router
+	router.HandleFunc("/api/testOk", h.TestHandler).Methods("GET")
 
 	// handlers categories
 	router.HandleFunc("/api/create_category", h.CreateCategory).Methods("POST")

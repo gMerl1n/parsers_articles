@@ -2,14 +2,21 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/gMerl1on/parsers_articles/02_articles/internal/domain"
+	er "github.com/gMerl1on/parsers_articles/02_articles/pkg/errors"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 )
 
+const (
+	catTables = "categories"
+)
+
 type StorageCategory interface {
-	CreateCategory(ctx context.Context, providerSign string, url string) (int, error)
-	GetCategory(ctx context.Context) ([]string, error)
+	CreateCategory(ctx context.Context, name string, url string) (int, error)
+	GetCategories(ctx context.Context) ([]domain.Category, error)
 }
 
 type CategoryRepo struct {
@@ -24,10 +31,51 @@ func NewCategoryRepo(db *pgxpool.Pool, log *zap.Logger) *CategoryRepo {
 	}
 }
 
-func (r *CategoryRepo) CreateCategory(ctx context.Context, providerSign string, url string) (int, error) {
-	return 0, nil
+func (r *CategoryRepo) CreateCategory(ctx context.Context, name string, url string) (int, error) {
+
+	var category domain.Category
+
+	query := fmt.Sprintf("INSERT INTO %s (ID, name, url) VALUES ($1, $2, $3) RETURNING ID", catTables)
+
+	if err := r.db.QueryRow(ctx, query,
+		category.ID,
+		category.Name,
+		category.Url,
+	).Scan(&category); err != nil {
+		return 0, er.CategoryIsAlready.SetCause(fmt.Sprint(err))
+	}
+
+	return category.ID, nil
+
 }
 
-func (r *CategoryRepo) GetCategory(ctx context.Context) ([]string, error) {
-	return nil, nil
+func (r *CategoryRepo) GetCategories(ctx context.Context) ([]domain.Category, error) {
+
+	categories := make([]domain.Category, 0)
+
+	query := fmt.Sprintf("SELECT ID, name, url FROM %s", catTables)
+
+	rowsCategories, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	for rowsCategories.Next() {
+		var category domain.Category
+
+		err = rowsCategories.Scan(
+			&category.ID,
+			&category.Name,
+			&category.Url,
+		)
+
+		if err != nil {
+			er.IncorrectRequest.SetCause(fmt.Sprint(err))
+			return nil, err
+		}
+
+		categories = append(categories, category)
+	}
+
+	return categories, nil
 }
