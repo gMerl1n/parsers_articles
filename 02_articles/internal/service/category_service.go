@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
+	"go.uber.org/zap"
 )
 
 type ServiceCategory interface {
@@ -12,12 +13,14 @@ type ServiceCategory interface {
 }
 
 type CategoryService struct {
-	repo repository.StorageCategory
+	repo   repository.StorageCategory
+	logger *zap.Logger
 }
 
-func NewCategoryService(repo repository.StorageCategory) *CategoryService {
+func NewCategoryService(repo repository.StorageCategory, log *zap.Logger) *CategoryService {
 	return &CategoryService{
-		repo: repo,
+		repo:   repo,
+		logger: log,
 	}
 }
 

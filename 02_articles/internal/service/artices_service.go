@@ -5,6 +5,7 @@ import (
 
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
 	tt "github.com/gMerl1on/parsers_articles/02_articles/internal/types"
+	"go.uber.org/zap"
 )
 
 type ServiceArticles interface {
@@ -13,12 +14,14 @@ type ServiceArticles interface {
 }
 
 type ArticlesService struct {
-	repo repository.StorageArticles
+	repo   repository.StorageArticles
+	logger *zap.Logger
 }
 
-func NewArticlesSerivce(repo repository.StorageArticles) *ArticlesService {
+func NewArticlesSerivce(repo repository.StorageArticles, log *zap.Logger) *ArticlesService {
 	return &ArticlesService{
-		repo: repo,
+		repo:   repo,
+		logger: log,
 	}
 }
 
