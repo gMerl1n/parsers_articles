@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gMerl1n/parsers_articles/configs"
+	"github.com/gMerl1on/parsers_articles/02_articles/configs"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
