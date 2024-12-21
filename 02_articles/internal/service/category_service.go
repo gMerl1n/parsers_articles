@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/gMerl1n/parsers_articles/internal/repository"
+	"github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
 )
 
 type ServiceCategory interface {

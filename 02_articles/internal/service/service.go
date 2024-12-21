@@ -1,6 +1,6 @@
 package service
 
-import "github.com/gMerl1n/parsers_articles/internal/repository"
+import "github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
 
 type Services struct {
 	ServiceArticles ServiceArticles

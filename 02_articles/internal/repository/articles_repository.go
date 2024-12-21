@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	tt "github.com/gMerl1n/parsers_articles/internal/types"
+	tt "github.com/gMerl1on/parsers_articles/02_articles/internal/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
