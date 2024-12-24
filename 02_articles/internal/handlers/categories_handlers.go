@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gMerl1on/parsers_articles/02_articles/pkg/errors"
@@ -45,12 +44,16 @@ func (h *Handler) GetCategories(w http.ResponseWriter, r *http.Request) {
 
 	categories, err := h.services.ServiceCategory.GetCategory(r.Context())
 	if err != nil {
-		fmt.Println("Не получилось достать все категории")
+		h.logger.Warn("Failed to decode request body category", zap.Error(err))
+		errors.SendHttpError(w, errors.InternalServerError)
+		return
 	}
 
 	marshalledCategories, err := json.Marshal(categories)
 	if err != nil {
-		fmt.Println("Не получилось make marshal categories")
+		h.logger.Warn("Не получилось make marshal categories", zap.Error(err))
+		errors.SendHttpError(w, errors.InternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
