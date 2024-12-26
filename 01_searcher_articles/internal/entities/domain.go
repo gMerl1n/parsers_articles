@@ -1,8 +1,8 @@
 package entities
 
 type Article struct {
-	Name        string
 	Author      string
+	Title       string
 	Body        string
-	PublishedAt float32
+	PublishedAt int64
 }
