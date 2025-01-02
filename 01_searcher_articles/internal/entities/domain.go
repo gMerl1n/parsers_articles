@@ -6,3 +6,12 @@ type Article struct {
 	Body        string
 	PublishedAt int64
 }
+
+type Category struct {
+	ID           int
+	Name         string
+	ProviderSign string
+	URL          string
+	CreatedAt    float64
+	UpdatedAt    float64
+}
