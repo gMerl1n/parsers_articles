@@ -20,7 +20,7 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	categoryID, err := h.services.ServiceCategory.CreateCategory(r.Context(), categoryRequest.Name, categoryRequest.Url)
+	categoryID, err := h.services.ServiceCategory.CreateCategory(r.Context(), categoryRequest.Name, categoryRequest.URL, categoryRequest.ProviderSign)
 	if err != nil {
 		h.logger.Warn("Не удалось отправить ссылку на категорию в сервисы", zap.Error(err))
 		errors.SendHttpError(w, err)

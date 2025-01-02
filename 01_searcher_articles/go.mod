@@ -5,6 +5,7 @@ go 1.23.4
 require (
 	github.com/PuerkitoBio/goquery v1.10.1
 	github.com/jackc/pgx/v5 v5.7.2
+	github.com/joho/godotenv v1.5.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.33.0
 )

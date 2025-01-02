@@ -9,7 +9,7 @@ import (
 )
 
 type ServiceCategory interface {
-	CreateCategory(ctx context.Context, name string, url string) (int, error)
+	CreateCategory(ctx context.Context, name, url, providerSign string) (int, error)
 	GetCategory(ctx context.Context) ([]domain.Category, error)
 }
 
@@ -25,9 +25,9 @@ func NewCategoryService(repo repository.StorageCategory, log *zap.Logger) *Categ
 	}
 }
 
-func (s *CategoryService) CreateCategory(ctx context.Context, name string, url string) (int, error) {
+func (s *CategoryService) CreateCategory(ctx context.Context, name, url, providerSign string) (int, error) {
 
-	categoryID, err := s.repo.CreateCategory(ctx, name, url)
+	categoryID, err := s.repo.CreateCategory(ctx, name, url, providerSign)
 	if err != nil {
 		return 0, err
 	}

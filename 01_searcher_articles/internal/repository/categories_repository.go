@@ -33,7 +33,7 @@ func (c *CategoryRepo) GetCategoriesBySign(ctx context.Context, sign string) ([]
 
 	listCategories := make([]entities.Category, 0)
 
-	query := fmt.Sprintf("SELECT * FROM %s WHERE provider_sign $2", tableCatgories)
+	query := fmt.Sprintf("SELECT id, name, provider_sign, url, created_at, updated_at FROM %s WHERE provider_sign = $1", tableCatgories)
 
 	rowsCategoriesBySign, err := c.db.Query(ctx, query, sign)
 	if err != nil {

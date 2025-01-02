@@ -12,11 +12,17 @@ import (
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/internal/services"
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/pkg/db"
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/pkg/logging"
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 )
 
 func main() {
 	fmt.Println("Searcher articles service")
+
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	logger, err := logging.InitLogger()
 	if err != nil {
@@ -45,8 +51,12 @@ func main() {
 	}
 
 	for _, cat := range categories {
+
 		data := entities.NewDataForParsing(cat.URL, cat.ProviderSign, 123123123123)
-		parserHabr.ParseLoop(data)
+
+		parsedData, _ := parserHabr.ParseLoop(data)
+
+		serv.ServiceArticle.CreateArticles(ctx, parsedData.Articles)
 
 	}
 

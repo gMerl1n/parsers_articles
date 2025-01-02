@@ -102,16 +102,16 @@ func (p *ParserHabr) GetNumPages(pageHTML *goquery.Document) string {
 
 func (p *ParserHabr) IsDeepExceeded(article *entities.Article, deep int64) bool {
 
-	if article.PublishedAt > deep {
-		p.logger.Info("Deep has been exceeded", zap.String("Title article", article.Title))
-		return true
-	} else {
-		return false
-	}
-
+	// if article.PublishedAt > deep {
+	// 	p.logger.Info("Deep has been exceeded", zap.String("Title article", article.Title))
+	// 	return true
+	// } else {
+	// 	return false
+	// }
+	return true
 }
 
-func (p *ParserHabr) ParseArticle(urlPage string) (entities.Article, error) {
+func (p *ParserHabr) ParseArticle(urlPage, providerSign string) (entities.Article, error) {
 
 	pageHTML, err := p.MakeRequest(urlPage)
 	if err != nil {
@@ -123,16 +123,21 @@ func (p *ParserHabr) ParseArticle(urlPage string) (entities.Article, error) {
 	body := pageHTML.Find(".tm-article-body").Text()
 	publisedAt := pageHTML.Find(".tm-article-datetime-published").Text()
 
-	date, err := time.Parse("2006-01-02, 03:04AM", publisedAt)
-	if err != nil {
-		return entities.Article{}, err
-	}
+	fmt.Println("publisedAt")
+	fmt.Println(publisedAt)
+
+	// _, err := time.Parse("2006-01-02, 03:04AM", publisedAt)
+	// if err != nil {
+	// 	return entities.Article{}, err
+	// }
 
 	return entities.Article{
-		Author:      author,
-		Title:       title,
-		Body:        body,
-		PublishedAt: date.Unix(),
+		Author:       author,
+		Title:        title,
+		ProviderSign: providerSign,
+		URL:          urlPage,
+		Body:         body,
+		PublishedAt:  time.Now(),
 	}, nil
 
 }
@@ -156,13 +161,13 @@ func (p *ParserHabr) GetArticleUrls(numPages int, urlCategory string) []string {
 
 }
 
-func (p *ParserHabr) ParseLoop(data *entities.DataForParsing) error {
+func (p *ParserHabr) ParseLoop(data *entities.DataForParsing) (*entities.DataForParsing, error) {
 
 	urlCategory := data.UrlCategory
 
 	pageHTML, err := p.MakeRequest(urlCategory)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	numPages := p.GetNumPages(pageHTML)
@@ -173,19 +178,16 @@ func (p *ParserHabr) ParseLoop(data *entities.DataForParsing) error {
 	numPagesInt, err := strconv.Atoi(numPages)
 	if err != nil {
 		p.logger.Warn("Failed to cast string numPages to int", zap.Error(err))
-		return err
+		return nil, err
 	}
 
 	urlPages := p.GetArticleUrls(numPagesInt, urlCategory)
 
-	for _, url := range urlPages {
-		fmt.Println(url)
-		parsedArticle, err := p.ParseArticle(url)
+	for _, url := range urlPages[0:2] {
+		parsedArticle, err := p.ParseArticle(url, data.Provider)
 		if err != nil {
 			fmt.Print(err)
 		}
-
-		fmt.Println(parsedArticle)
 
 		data.Articles = append(data.Articles, parsedArticle)
 
@@ -193,6 +195,6 @@ func (p *ParserHabr) ParseLoop(data *entities.DataForParsing) error {
 
 	fmt.Println(urlPages[0:2])
 
-	return nil
+	return data, nil
 
 }

@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	catTables = "categories"
+	categoryTable = "categories"
 )
 
 type StorageCategory interface {
-	CreateCategory(ctx context.Context, name string, url string) (int, error)
+	CreateCategory(ctx context.Context, name, url, providerSign string) (int, error)
 	GetCategories(ctx context.Context) ([]domain.Category, error)
 }
 
@@ -31,15 +31,16 @@ func NewCategoryRepo(db *pgxpool.Pool, log *zap.Logger) *CategoryRepo {
 	}
 }
 
-func (r *CategoryRepo) CreateCategory(ctx context.Context, name string, url string) (int, error) {
+func (r *CategoryRepo) CreateCategory(ctx context.Context, name, url, providerSign string) (int, error) {
 
 	var categoryID int
 
-	query := fmt.Sprintf("INSERT INTO %s (name, url) VALUES ($1, $2) RETURNING id", catTables)
+	query := fmt.Sprintf("INSERT INTO %s (name, url, provider_sign) VALUES ($1, $2, $3) RETURNING id", categoryTable)
 
 	if err := r.db.QueryRow(ctx, query,
 		name,
 		url,
+		providerSign,
 	).Scan(&categoryID); err != nil {
 		return 0, er.IncorrectRequest.SetCause(fmt.Sprint(err))
 	}
@@ -52,7 +53,7 @@ func (r *CategoryRepo) GetCategories(ctx context.Context) ([]domain.Category, er
 
 	categories := make([]domain.Category, 0)
 
-	query := fmt.Sprintf("SELECT ID, name, url FROM %s", catTables)
+	query := fmt.Sprintf("SELECT ID, name, url FROM %s", categoryTable)
 
 	rowsCategories, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -65,7 +66,8 @@ func (r *CategoryRepo) GetCategories(ctx context.Context) ([]domain.Category, er
 		err = rowsCategories.Scan(
 			&category.ID,
 			&category.Name,
-			&category.Url,
+			&category.ProviderSign,
+			&category.URL,
 		)
 
 		if err != nil {

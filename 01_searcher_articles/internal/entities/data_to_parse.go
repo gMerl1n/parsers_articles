@@ -1,11 +1,10 @@
 package entities
 
 type DataForParsing struct {
-	UrlCategory        string
-	ProviderCategoryID string
-	Provider           string
-	Articles           []Article
-	Deep               int64
+	UrlCategory string
+	Provider    string
+	Articles    []Article
+	Deep        int64
 }
 
 func NewDataForParsing(urlCategory, provider string, deep int64) *DataForParsing {
