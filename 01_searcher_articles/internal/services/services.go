@@ -6,11 +6,13 @@ import (
 )
 
 type Services struct {
-	ServiceArticle ServiceArticle
+	ServiceArticle  ServiceArticle
+	ServiceCategory ServiceCategory
 }
 
-func NewServices(repo repository.Repositories, log *zap.Logger) *Services {
+func NewServices(repo *repository.Repositories, log *zap.Logger) *Services {
 	return &Services{
-		ServiceArticle: NewArticlesSerivce(repo.Articles, log),
+		ServiceArticle:  NewArticlesSerivce(repo.Articles, log),
+		ServiceCategory: NewCategoryService(repo.Categories, log),
 	}
 }

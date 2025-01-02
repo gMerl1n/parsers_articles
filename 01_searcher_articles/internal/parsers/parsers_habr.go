@@ -32,14 +32,12 @@ var Headers = map[string][]string{
 }
 
 type ParserHabr struct {
-	dataForParsing entities.DataForParsing
-	logger         *zap.Logger
+	logger *zap.Logger
 }
 
-func NewParserHabr(data entities.DataForParsing, log *zap.Logger) *ParserHabr {
+func NewParserHabr(log *zap.Logger) *ParserHabr {
 	return &ParserHabr{
-		dataForParsing: data,
-		logger:         log,
+		logger: log,
 	}
 }
 
@@ -102,9 +100,9 @@ func (p *ParserHabr) GetNumPages(pageHTML *goquery.Document) string {
 
 }
 
-func (p *ParserHabr) IsDeepExceeded(article entities.Article) bool {
+func (p *ParserHabr) IsDeepExceeded(article *entities.Article, deep int64) bool {
 
-	if article.PublishedAt > p.dataForParsing.Deep {
+	if article.PublishedAt > deep {
 		p.logger.Info("Deep has been exceeded", zap.String("Title article", article.Title))
 		return true
 	} else {
@@ -139,16 +137,16 @@ func (p *ParserHabr) ParseArticle(urlPage string) (entities.Article, error) {
 
 }
 
-func (p *ParserHabr) GetArticleUrls(numPages int) []string {
+func (p *ParserHabr) GetArticleUrls(numPages int, urlCategory string) []string {
 
 	articlesUrls := make([]string, 0)
 
 	for page := 0; page < numPages; page++ {
 
 		if page == 0 {
-			articlesUrls = append(articlesUrls, p.dataForParsing.UrlCategory)
+			articlesUrls = append(articlesUrls, urlCategory)
 		} else {
-			urlCat := p.dataForParsing.UrlCategory + "page" + strconv.Itoa(page) + "/"
+			urlCat := urlCategory + "page" + strconv.Itoa(page) + "/"
 			articlesUrls = append(articlesUrls, urlCat)
 		}
 
@@ -158,9 +156,9 @@ func (p *ParserHabr) GetArticleUrls(numPages int) []string {
 
 }
 
-func (p *ParserHabr) ParseLoop() error {
+func (p *ParserHabr) ParseLoop(data *entities.DataForParsing) error {
 
-	urlCategory := p.dataForParsing.UrlCategory
+	urlCategory := data.UrlCategory
 
 	pageHTML, err := p.MakeRequest(urlCategory)
 	if err != nil {
@@ -178,7 +176,7 @@ func (p *ParserHabr) ParseLoop() error {
 		return err
 	}
 
-	urlPages := p.GetArticleUrls(numPagesInt)
+	urlPages := p.GetArticleUrls(numPagesInt, urlCategory)
 
 	for _, url := range urlPages {
 		fmt.Println(url)
@@ -189,7 +187,7 @@ func (p *ParserHabr) ParseLoop() error {
 
 		fmt.Println(parsedArticle)
 
-		p.dataForParsing.Articles = append(p.dataForParsing.Articles, parsedArticle)
+		data.Articles = append(data.Articles, parsedArticle)
 
 	}
 

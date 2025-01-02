@@ -21,11 +21,11 @@ func NewArticlesSerivce(repo repository.RepoArticle, log *zap.Logger) *ArticleSe
 }
 
 type ServiceArticle interface {
-	CreateArticles(ctx context.Context, articles []entities.Article) (bool, error)
+	CreateArticle(ctx context.Context, article entities.Article) (bool, error)
 }
 
-func (a *ArticleService) CreateArticles(ctx context.Context, articles []entities.Article) (bool, error) {
-	res, err := a.repo.CreateArticles(ctx, articles)
+func (a *ArticleService) CreateArticle(ctx context.Context, article entities.Article) (bool, error) {
+	res, err := a.repo.CreateArticle(ctx, article)
 	if err != nil {
 		return false, err
 	}
