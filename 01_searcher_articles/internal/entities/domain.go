@@ -1,10 +1,12 @@
 package entities
 
 type Article struct {
-	Author      string
-	Title       string
-	Body        string
-	PublishedAt int64
+	Author       string
+	Title        string
+	ProviderSign string
+	URL          string
+	Body         string
+	PublishedAt  int64
 }
 
 type Category struct {
