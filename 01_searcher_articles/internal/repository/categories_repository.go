@@ -26,10 +26,10 @@ const (
 )
 
 type RepoCategory interface {
-	GetCategoriesBySign(ctx context.Context, sign string) ([]string, error)
+	GetCategoriesBySign(ctx context.Context, sign string) ([]entities.Category, error)
 }
 
-func (c *CategoryRepo) GetCategoriesBySign(ctx context.Context, sign string) ([]string, error) {
+func (c *CategoryRepo) GetCategoriesBySign(ctx context.Context, sign string) ([]entities.Category, error) {
 
 	listCategories := make([]entities.Category, 0)
 
@@ -37,7 +37,8 @@ func (c *CategoryRepo) GetCategoriesBySign(ctx context.Context, sign string) ([]
 
 	rowsCategoriesBySign, err := c.db.Query(ctx, query, sign)
 	if err != nil {
-		fmt.Println("qwe")
+		c.logger.Warn("Failed to get categories from DB", zap.String("Provider Sign %s", sign))
+		return nil, err
 	}
 
 	for rowsCategoriesBySign.Next() {
@@ -54,12 +55,13 @@ func (c *CategoryRepo) GetCategoriesBySign(ctx context.Context, sign string) ([]
 		)
 
 		if err != nil {
-			fmt.Println("Error")
+			c.logger.Warn("Failed to create list of Categories", zap.String("Provider Sign %s", sign))
+			return nil, err
 		}
 
 		listCategories = append(listCategories, category)
 
 	}
 
-	return nil, nil
+	return listCategories, nil
 }
