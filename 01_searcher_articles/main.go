@@ -6,14 +6,12 @@ import (
 	"log"
 
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/configs"
-	"github.com/gMerl1on/parsers_articles/01_searcher_articles/internal/entities"
-	"github.com/gMerl1on/parsers_articles/01_searcher_articles/internal/parsers"
+	parserhb "github.com/gMerl1on/parsers_articles/01_searcher_articles/internal/parsers/parser_hb"
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/internal/repository"
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/internal/services"
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/pkg/db"
 	"github.com/gMerl1on/parsers_articles/01_searcher_articles/pkg/logging"
 	"github.com/joho/godotenv"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -43,21 +41,7 @@ func main() {
 	repo := repository.NewRepositories(db, logger)
 	serv := services.NewServices(repo, logger)
 
-	parserHabr := parsers.NewParserHabr(logger)
-
-	categories, err := serv.ServiceCategory.GetCategoriesBySign(ctx, "HB")
-	if err != nil {
-		logger.Warn("Failed to get categories", zap.Error(err))
-	}
-
-	for _, cat := range categories {
-
-		data := entities.NewDataForParsing(cat.URL, cat.ProviderSign, 123123123123)
-
-		parsedData, _ := parserHabr.ParseLoop(data)
-
-		serv.ServiceArticle.CreateArticles(ctx, parsedData.Articles)
-
-	}
+	runnerHB := parserhb.NewRunnerHB("HB", ctx, logger, serv.ServiceCategory, serv.ServiceArticle)
+	runnerHB.RunParserHB()
 
 }
