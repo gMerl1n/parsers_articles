@@ -1,10 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS categories (
+CREATE TABLE IF NOT EXISTS users (
  id SERIAL PRIMARY KEY,
  name VARCHAR(255) NOT NULL,
- url VARCHAR(255) NOT NULL,
- provider_sign VARCHAR(255),
+ surname VARCHAR(255) NOT NULL,
+ email VARCHAR(255) NOT NULL,
  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS categories (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS users;
 -- +goose StatementEnd

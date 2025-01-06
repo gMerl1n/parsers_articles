@@ -53,7 +53,7 @@ func (r *CategoryRepo) GetCategories(ctx context.Context) ([]domain.Category, er
 
 	categories := make([]domain.Category, 0)
 
-	query := fmt.Sprintf("SELECT ID, name, url FROM %s", categoryTable)
+	query := fmt.Sprintf("SELECT id, name, url, provider_sign, created_at FROM %s", categoryTable)
 
 	rowsCategories, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -68,6 +68,7 @@ func (r *CategoryRepo) GetCategories(ctx context.Context) ([]domain.Category, er
 			&category.Name,
 			&category.ProviderSign,
 			&category.URL,
+			&category.CreatedAt,
 		)
 
 		if err != nil {
