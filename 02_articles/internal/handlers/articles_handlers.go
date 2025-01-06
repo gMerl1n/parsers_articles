@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/gMerl1on/parsers_articles/02_articles/constants"
 	"github.com/gMerl1on/parsers_articles/02_articles/pkg/errors"
 	"go.uber.org/zap"
 )
@@ -25,5 +26,27 @@ func (h *Handler) GetArticles(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(marshalledArticles)
+
+}
+
+func (h *Handler) GetArticlesBySign(w http.ResponseWriter, r *http.Request) {
+
+	providerSignOptions := r.Context().Value(constants.OptionsContextKey).(SortProviderSignOption)
+
+	articlesBySign, err := h.services.ServiceArticles.GetArticlesBySign(r.Context(), providerSignOptions.providerSign)
+	if err != nil {
+		h.logger.Warn("Failed to get articles", zap.Error(err))
+		errors.SendHttpError(w, errors.InternalServerError)
+	}
+
+	marshalledArticlesBySign, err := json.Marshal(articlesBySign)
+	if err != nil {
+		h.logger.Warn("Не получилось make marshal articles", zap.Error(err))
+		errors.SendHttpError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(marshalledArticlesBySign)
 
 }

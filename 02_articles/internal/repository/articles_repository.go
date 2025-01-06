@@ -16,6 +16,7 @@ const (
 
 type StorageArticles interface {
 	GetArticles(ctx context.Context) ([]domain.Article, error)
+	GetArticlesBySign(ctx context.Context, providerSign string) ([]domain.Article, error)
 }
 
 type ArticleRepo struct {
@@ -65,5 +66,43 @@ func (r *ArticleRepo) GetArticles(ctx context.Context) ([]domain.Article, error)
 	}
 
 	return articles, nil
+
+}
+
+func (r *ArticleRepo) GetArticlesBySign(ctx context.Context, providerSign string) ([]domain.Article, error) {
+
+	articlesBySign := make([]domain.Article, 0)
+
+	query := fmt.Sprintf("SELECT id, author, title, body, url, provider_sign, published_at, created_at, updated_at  FROM %s WHERE provider_sign = $1", articleTable)
+
+	rowsArticles, err := r.db.Query(ctx, query, providerSign)
+	if err != nil {
+		return nil, err
+	}
+
+	for rowsArticles.Next() {
+		var article domain.Article
+
+		err = rowsArticles.Scan(
+			&article.ID,
+			&article.Author,
+			&article.Title,
+			&article.Body,
+			&article.URL,
+			&article.ProviderSign,
+			&article.PublishedAt,
+			&article.CreatedAt,
+			&article.UpdatedAt,
+		)
+
+		if err != nil {
+			er.IncorrectRequest.SetCause(fmt.Sprint(err))
+			return nil, err
+		}
+
+		articlesBySign = append(articlesBySign, article)
+	}
+
+	return articlesBySign, nil
 
 }

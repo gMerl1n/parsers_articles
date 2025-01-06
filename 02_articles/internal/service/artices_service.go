@@ -10,6 +10,7 @@ import (
 
 type ServiceArticles interface {
 	GetArticles(ctx context.Context) ([]domain.Article, error)
+	GetArticlesBySign(ctx context.Context, providerSign string) ([]domain.Article, error)
 }
 
 type ArticlesService struct {
@@ -32,4 +33,15 @@ func (s *ArticlesService) GetArticles(ctx context.Context) ([]domain.Article, er
 	}
 
 	return articles, err
+}
+
+func (s *ArticlesService) GetArticlesBySign(ctx context.Context, providerSign string) ([]domain.Article, error) {
+
+	articlesBySign, err := s.repo.GetArticlesBySign(ctx, providerSign)
+	if err != nil {
+		return nil, err
+	}
+
+	return articlesBySign, err
+
 }
