@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -62,7 +63,7 @@ func (p *ParserHabr) MakeRequest(url string) (*goquery.Document, error) {
 	}
 
 	if response.StatusCode != 200 {
-		p.logger.Warn("Failed to make request", zap.Int("Status code", response.StatusCode))
+		p.logger.Warn("Failed to make request", zap.Int("Status code", response.StatusCode), zap.String("URL", url))
 		return nil, err
 	}
 
@@ -161,7 +162,26 @@ func (p *ParserHabr) GetArticleUrls(numPages int, urlCategory string) []string {
 
 }
 
+func (p *ParserHabr) Parse(url string, data *entities.DataForParsing, wg *sync.WaitGroup, semaphore *Semaphore) {
+
+	semaphore.Acquire()
+
+	parsedArticle, err := p.ParseArticle(url, data.Provider)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	defer wg.Done()
+	defer semaphore.Release()
+
+	data.Articles = append(data.Articles, parsedArticle)
+}
+
 func (p *ParserHabr) ParseLoop(data *entities.DataForParsing) (*entities.DataForParsing, error) {
+
+	wg := &sync.WaitGroup{}
+
+	semaphore := NewSemaphore(4)
 
 	urlCategory := data.UrlCategory
 
@@ -184,14 +204,14 @@ func (p *ParserHabr) ParseLoop(data *entities.DataForParsing) (*entities.DataFor
 	urlPages := p.GetArticleUrls(numPagesInt, urlCategory)
 
 	for _, url := range urlPages[0:2] {
-		parsedArticle, err := p.ParseArticle(url, data.Provider)
-		if err != nil {
-			fmt.Print(err)
-		}
 
-		data.Articles = append(data.Articles, parsedArticle)
+		wg.Add(1)
+
+		go p.Parse(url, data, wg, semaphore)
 
 	}
+
+	wg.Wait()
 
 	fmt.Println(urlPages[0:2])
 
