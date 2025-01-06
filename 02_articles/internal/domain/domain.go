@@ -1,10 +1,17 @@
 package domain
 
+import "time"
+
 type Article struct {
-	Title   string
-	Author  string
-	Body    string
-	Created float64
+	ID           int
+	Title        string
+	Author       string
+	Body         string
+	ProviderSign string
+	URL          string
+	PublishedAt  time.Time
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type Category struct {
@@ -12,6 +19,6 @@ type Category struct {
 	Name         string
 	ProviderSign string
 	URL          string
-	CreatedAt    float64
-	UpdatedAt    float64
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

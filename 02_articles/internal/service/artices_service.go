@@ -9,7 +9,6 @@ import (
 )
 
 type ServiceArticles interface {
-	GetArticleByID(ctx context.Context, ID int) (domain.Article, error)
 	GetArticles(ctx context.Context) ([]domain.Article, error)
 }
 
@@ -25,15 +24,12 @@ func NewArticlesSerivce(repo repository.StorageArticles, log *zap.Logger) *Artic
 	}
 }
 
-func (s *ArticlesService) GetArticleByID(ctx context.Context, ID int) (domain.Article, error) {
-	return domain.Article{
-		Title:   "title",
-		Author:  "author",
-		Body:    "body",
-		Created: 11111.1,
-	}, nil
-}
-
 func (s *ArticlesService) GetArticles(ctx context.Context) ([]domain.Article, error) {
-	return nil, nil
+
+	articles, err := s.repo.GetArticles(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, err
 }
