@@ -11,6 +11,7 @@ import (
 type ServiceArticles interface {
 	GetArticles(ctx context.Context) ([]domain.Article, error)
 	GetArticlesBySign(ctx context.Context, providerSign string) ([]domain.Article, error)
+	GetArticlesByCategory(ctx context.Context, categoryID int) ([]domain.Article, error)
 }
 
 type ArticlesService struct {
@@ -43,5 +44,16 @@ func (s *ArticlesService) GetArticlesBySign(ctx context.Context, providerSign st
 	}
 
 	return articlesBySign, err
+
+}
+
+func (s *ArticlesService) GetArticlesByCategory(ctx context.Context, categoryID int) ([]domain.Article, error) {
+
+	articlesByCategory, err := s.repo.GetArticlesByCategory(ctx, categoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	return articlesByCategory, nil
 
 }

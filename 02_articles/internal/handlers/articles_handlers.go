@@ -50,3 +50,25 @@ func (h *Handler) GetArticlesBySign(w http.ResponseWriter, r *http.Request) {
 	w.Write(marshalledArticlesBySign)
 
 }
+
+func (h *Handler) GetArticlesByCategory(w http.ResponseWriter, r *http.Request) {
+
+	categoryID := r.Context().Value(constants.OptionsContextKey).(CategoryIDOption)
+
+	articlesByCategory, err := h.services.ServiceArticles.GetArticlesByCategory(r.Context(), categoryID.ID)
+	if err != nil {
+		h.logger.Warn("Failed to get articles", zap.Error(err))
+		errors.SendHttpError(w, errors.InternalServerError)
+	}
+
+	marshalledArticlesByCategory, err := json.Marshal(articlesByCategory)
+	if err != nil {
+		h.logger.Warn("Не получилось make marshal articles", zap.Error(err))
+		errors.SendHttpError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(marshalledArticlesByCategory)
+
+}

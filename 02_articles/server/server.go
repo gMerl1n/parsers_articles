@@ -36,6 +36,7 @@ func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.Config
 	// handlers articles
 	router.HandleFunc("/api/articles", h.GetArticles).Methods("GET")
 	router.HandleFunc("/api/articlesBySign", handlers.SortProviderSignMiddleware(h.GetArticlesBySign)).Methods("GET")
+	router.HandleFunc("/api/articlesByCategory", handlers.CategoryIDMiddleware(h.GetArticlesByCategory)).Methods("GET")
 
 	return &http.Server{
 		Addr:    BindAddr,

@@ -17,6 +17,7 @@ const (
 type StorageArticles interface {
 	GetArticles(ctx context.Context) ([]domain.Article, error)
 	GetArticlesBySign(ctx context.Context, providerSign string) ([]domain.Article, error)
+	GetArticlesByCategory(ctx context.Context, categoryID int) ([]domain.Article, error)
 }
 
 type ArticleRepo struct {
@@ -35,7 +36,7 @@ func (r *ArticleRepo) GetArticles(ctx context.Context) ([]domain.Article, error)
 
 	articles := make([]domain.Article, 0)
 
-	query := fmt.Sprintf("SELECT id, author, title, body, url, provider_sign, published_at, created_at, updated_at  FROM %s", articleTable)
+	query := "SELECT a.id, a.author, a.title, a.body, a.url, a.provider_sign, c.name, a.published_at, a.created_at, a.updated_at FROM articles AS a INNER JOIN categories AS c ON a.id = c.id"
 
 	rowsArticles, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -51,6 +52,7 @@ func (r *ArticleRepo) GetArticles(ctx context.Context) ([]domain.Article, error)
 			&article.Title,
 			&article.Body,
 			&article.URL,
+			&article.CategoryName,
 			&article.ProviderSign,
 			&article.PublishedAt,
 			&article.CreatedAt,
@@ -104,5 +106,46 @@ func (r *ArticleRepo) GetArticlesBySign(ctx context.Context, providerSign string
 	}
 
 	return articlesBySign, nil
+
+}
+
+func (r *ArticleRepo) GetArticlesByCategory(ctx context.Context, categoryID int) ([]domain.Article, error) {
+
+	var categoryArticles []domain.Article
+
+	query := fmt.Sprintf(`SELECT a.id, a.author, a.title, a.body, a.url, c.name, a.provider_sign, a.published_at
+			  			  FROM %s AS a JOIN %s AS c ON $1 = a.category_id
+			  			  WHERE c.id = $1`, articleTable, categoryTable)
+
+	rowsArticles, err := r.db.Query(ctx, query, categoryID)
+	if err != nil {
+		return nil, err
+	}
+
+	for rowsArticles.Next() {
+
+		var article domain.Article
+
+		err = rowsArticles.Scan(
+			&article.ID,
+			&article.Author,
+			&article.Title,
+			&article.Body,
+			&article.URL,
+			&article.CategoryName,
+			&article.ProviderSign,
+			&article.PublishedAt,
+		)
+
+		if err != nil {
+			er.IncorrectRequest.SetCause(fmt.Sprint(err))
+			return nil, err
+		}
+
+		categoryArticles = append(categoryArticles, article)
+
+	}
+
+	return categoryArticles, nil
 
 }
