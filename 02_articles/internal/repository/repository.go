@@ -8,11 +8,13 @@ import (
 type Repositories struct {
 	Articles   StorageArticles
 	Categories StorageCategory
+	Users      StorageUser
 }
 
 func NewRepositories(db *pgxpool.Pool, log *zap.Logger) *Repositories {
 	return &Repositories{
 		Articles:   NewArticlesRepo(db, log),
 		Categories: NewCategoryRepo(db, log),
+		Users:      NewUserRepo(db, log),
 	}
 }
