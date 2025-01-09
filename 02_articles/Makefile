@@ -10,6 +10,9 @@ create_articles:
 create_users_role_id:
 	goose -dir migrations create users_add_role_id sql 
 
+create_users_age:
+	goose -dir migrations create users_add_age sql 
+
 create_articles_cat_id:
 	goose -dir migrations create articles_add_cat_id sql 
 

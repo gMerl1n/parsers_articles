@@ -15,7 +15,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var userRequest UserRequest
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&userRequest); err != nil {
-		h.logger.Warn("Failed to decode request body category", zap.Error(err))
+		h.logger.Warn("Failed to decode request body user", zap.Error(err))
 		errors.SendHttpError(w, errors.InternalServerError)
 		return
 	}
