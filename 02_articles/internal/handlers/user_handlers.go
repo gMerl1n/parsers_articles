@@ -12,15 +12,15 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	var userRequest UserRequest
+	var u UserRequest
 	defer r.Body.Close()
-	if err := json.NewDecoder(r.Body).Decode(&userRequest); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 		h.logger.Warn("Failed to decode request body user", zap.Error(err))
 		errors.SendHttpError(w, errors.InternalServerError)
 		return
 	}
 
-	userID, err := h.services.ServiceUser.CreateUser(r.Context(), userRequest.Name, userRequest.Surname, userRequest.Email, userRequest.Age)
+	userID, err := h.services.ServiceUser.CreateUser(r.Context(), u.Name, u.Surname, u.Email, u.Passwrod, u.RepeatPassword, u.Age)
 	if err != nil {
 		h.logger.Warn("Failed to register new user", zap.Error(err))
 		errors.SendHttpError(w, errors.InternalServerError)
