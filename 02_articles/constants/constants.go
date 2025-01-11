@@ -10,4 +10,8 @@ const (
 	UserRoleID   = 1
 	AdminRoleID  = 2
 	SuperAdminID = 3
+
+	JWTsecret       = "$3cr3t"
+	AccessTokenTTL  = 120
+	RefreshTokenTTL = 43200 // 30 days
 )
