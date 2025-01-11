@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/gMerl1on/parsers_articles/02_articles/configs"
+	"github.com/gMerl1on/parsers_articles/02_articles/constants"
+	"github.com/gMerl1on/parsers_articles/02_articles/pkg/jwt"
 	"github.com/gMerl1on/parsers_articles/02_articles/pkg/logging"
 	"github.com/gMerl1on/parsers_articles/02_articles/server"
 	"github.com/joho/godotenv"
@@ -40,11 +42,19 @@ func RunServer() error {
 	}
 
 	// Initialize configs
-	config := configs.NewConfig()
+	config, err := configs.NewConfig()
+	if err != nil {
+		log.Fatal("Failed to init config")
+	}
+
+	tokenManager, err := jwt.NewManager(constants.JWTsecret, constants.AccessTokenTTL, constants.RefreshTokenTTL)
+	if err != nil {
+		log.Fatal("Failed to load JWT Token manager")
+	}
 
 	// Initialize server, db, routing
 	ctx := context.Background()
-	srv, err := server.NewHttpServer(ctx, logger, config.Postgres, config.Bindaddr)
+	srv, err := server.NewHttpServer(ctx, logger, config.Postgres, config.Redis, config.Bindaddr, tokenManager)
 
 	if err != nil {
 		logger.Fatal("Failed to create HTTP server", zap.Error(err))

@@ -9,11 +9,12 @@ import (
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/service"
 	"github.com/gMerl1on/parsers_articles/02_articles/pkg/db"
+	"github.com/gMerl1on/parsers_articles/02_articles/pkg/jwt"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
 
-func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.ConfigPostgres, BindAddr string) (*http.Server, error) {
+func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.ConfigPostgres, BindAddr string, tokenManager jwt.TokenManager) (*http.Server, error) {
 
 	db, err := db.NewPostgresDB(ctx, postgres)
 	if err != nil {
@@ -21,7 +22,7 @@ func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.Config
 	}
 
 	repo := repository.NewRepositories(db, log)
-	serv := service.NewServices(repo, log)
+	serv := service.NewServices(repo, log, tokenManager)
 	h := handlers.NewHandler(serv, log)
 
 	router := mux.NewRouter()
