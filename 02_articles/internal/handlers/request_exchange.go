@@ -7,8 +7,10 @@ type CategoryRequest struct {
 }
 
 type UserRequest struct {
-	Name    string `json:"Name"`
-	Surname string `json:"Surname"`
-	Age     int    `json:"Age"`
-	Email   string `json:"Email"`
+	Name           string `json:"Name"`
+	Surname        string `json:"Surname"`
+	Age            int    `json:"Age"`
+	Email          string `json:"Email"`
+	Passwrod       string `json:"Password"`
+	RepeatPassword string `json:"RepeatPassword"`
 }

@@ -19,4 +19,7 @@ var (
 	InternalServerError = new("internal server error", 500)
 	BadGateway          = new("server received invalid response from upstream", 502)
 	UnknownError        = new("unknown error", 520)
+
+	// Incorrect user data
+	PasswordRepeatedPassword = new("Password and repeated password does not match", 404)
 )
