@@ -12,3 +12,14 @@ type User struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type LoginUser struct {
+	Email    string
+	Passwrod string
+}
+
+type UserByEmail struct {
+	ID       int
+	Email    string
+	Password string
+}
