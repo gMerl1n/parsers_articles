@@ -2,19 +2,15 @@ package repository
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 )
 
-type Session struct {
-	UserUUID  string
-	ExpiresAt time.Duration
-}
-
 type RedisStorageUser interface {
 	SetSession(ctx context.Context, RefreshToken string, sess Session) error
-	GetSession(ctx context.Context, RefreshToken string) (Session, error)
+	GetSession(ctx context.Context, RefreshToken string) (*Session, error)
 	DeleteSession(ctx context.Context, RefreshToken string) error
 }
 
@@ -26,8 +22,8 @@ func NewRedisStoreUser(client *redis.Client) *RedisRepoUser {
 	return &RedisRepoUser{client: client}
 }
 
-func (r *RedisRepoUser) SetSession(ctx context.Context, RefreshToken string, sess Session) error {
-	if err := r.client.HSet(ctx, RefreshToken, "UserUUID", sess.UserUUID, "ExpiresAt", sess.ExpiresAt).Err(); err != nil {
+func (r *RedisRepoUser) SetSession(ctx context.Context, RefreshToken string, userID int, expireAt time.Duration) error {
+	if err := r.client.HSet(ctx, RefreshToken, "UserID", userID, "ExpiresAt", expireAt).Err(); err != nil {
 		return err
 	}
 
@@ -38,18 +34,29 @@ func (r *RedisRepoUser) SetSession(ctx context.Context, RefreshToken string, ses
 	return nil
 }
 
-func (r *RedisRepoUser) GetSession(ctx context.Context, RefreshToken string) (Session, error) {
+func (r *RedisRepoUser) GetSession(ctx context.Context, RefreshToken string) (*Session, error) {
 
 	sess := Session{}
 
 	sessByRToken, err := r.client.HGetAll(ctx, RefreshToken).Result()
 	if err != nil {
-		return sess, err
+		return &sess, err
 	}
 
-	sess.UserUUID = sessByRToken["UserUUID"]
+	userID, ok := sessByRToken["UserID"]
+	if !ok {
+		return nil, err
+	}
 
-	return sess, nil
+	userIDint, err := strconv.Atoi(userID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	sess.UserID = userIDint
+
+	return &sess, nil
 }
 
 func (r *RedisRepoUser) DeleteSession(ctx context.Context, RefreshToken string) error {
