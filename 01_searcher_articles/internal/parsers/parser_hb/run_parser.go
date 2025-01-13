@@ -37,10 +37,10 @@ func (r *RunnerHB) RunParserHB() {
 
 	for _, cat := range categories {
 
-		data := entities.NewDataForParsing(cat.URL, cat.ProviderSign, 123123123123)
+		data := entities.NewDataForParsing(cat.URL, cat.ProviderSign, 123123123123, cat.ID)
 
 		parsedData, _ := parserHabr.ParseLoop(data)
 
-		r.servArticles.CreateArticles(r.ctx, parsedData.Articles)
+		r.servArticles.CreateArticles(r.ctx, parsedData)
 	}
 }
