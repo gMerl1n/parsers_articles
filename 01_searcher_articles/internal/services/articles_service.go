@@ -21,12 +21,12 @@ func NewArticlesSerivce(repo repository.RepoArticle, log *zap.Logger) *ArticleSe
 }
 
 type ServiceArticle interface {
-	CreateArticle(ctx context.Context, article entities.Article) (bool, error)
-	CreateArticles(ctx context.Context, articles []entities.Article) (bool, error)
+	CreateArticle(ctx context.Context, article *entities.Article, catID int) (bool, error)
+	CreateArticles(ctx context.Context, data *entities.DataForParsing) (bool, error)
 }
 
-func (a *ArticleService) CreateArticle(ctx context.Context, article entities.Article) (bool, error) {
-	res, err := a.repo.CreateArticle(ctx, article)
+func (a *ArticleService) CreateArticle(ctx context.Context, article *entities.Article, catID int) (bool, error) {
+	res, err := a.repo.CreateArticle(ctx, article, catID)
 	if err != nil {
 		return false, err
 	}
@@ -35,8 +35,8 @@ func (a *ArticleService) CreateArticle(ctx context.Context, article entities.Art
 
 }
 
-func (a *ArticleService) CreateArticles(ctx context.Context, articles []entities.Article) (bool, error) {
-	res, err := a.repo.CreateArticles(ctx, articles)
+func (a *ArticleService) CreateArticles(ctx context.Context, data *entities.DataForParsing) (bool, error) {
+	res, err := a.repo.CreateArticles(ctx, data)
 	if err != nil {
 		return false, err
 	}
