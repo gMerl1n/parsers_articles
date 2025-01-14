@@ -47,6 +47,7 @@ func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.Config
 
 	// handlers users
 	router.HandleFunc("/api/createUser", h.CreateUser).Methods("POST")
+	router.HandleFunc("/api/loginUser", h.LoginUser).Methods("GET")
 
 	return &http.Server{
 		Addr:    BindAddr,

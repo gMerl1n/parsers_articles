@@ -13,11 +13,6 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-type LoginUser struct {
-	Email    string
-	Passwrod string
-}
-
 type UserByEmail struct {
 	ID       int
 	Email    string
