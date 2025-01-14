@@ -8,8 +8,13 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+type Session struct {
+	UserID    int
+	ExpiresAt time.Duration
+}
+
 type RedisStorageUser interface {
-	SetSession(ctx context.Context, RefreshToken string, sess Session) error
+	SetSession(ctx context.Context, RefreshToken string, UserID int, ExpiresAt time.Duration) error
 	GetSession(ctx context.Context, RefreshToken string) (*Session, error)
 	DeleteSession(ctx context.Context, RefreshToken string) error
 }
@@ -22,8 +27,8 @@ func NewRedisStoreUser(client *redis.Client) *RedisRepoUser {
 	return &RedisRepoUser{client: client}
 }
 
-func (r *RedisRepoUser) SetSession(ctx context.Context, RefreshToken string, userID int, expireAt time.Duration) error {
-	if err := r.client.HSet(ctx, RefreshToken, "UserID", userID, "ExpiresAt", expireAt).Err(); err != nil {
+func (r *RedisRepoUser) SetSession(ctx context.Context, RefreshToken string, UserID string, ExpiresAt time.Duration) error {
+	if err := r.client.HSet(ctx, RefreshToken, "UserID", UserID, "ExpiresAt", ExpiresAt).Err(); err != nil {
 		return err
 	}
 
