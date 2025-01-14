@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gMerl1on/parsers_articles/02_articles/internal/domain"
+	"github.com/gMerl1on/parsers_articles/02_articles/constants"
 	"github.com/gMerl1on/parsers_articles/02_articles/internal/repository"
 	er "github.com/gMerl1on/parsers_articles/02_articles/pkg/errors"
 	"github.com/gMerl1on/parsers_articles/02_articles/pkg/jwt"
@@ -52,7 +52,7 @@ func (u *UserService) CreateUser(ctx context.Context, name, surname, email, pass
 	return userID, nil
 }
 
-func (u *UserService) LoginUser(ctx context.Context, email, password string) (*domain.UserByEmail, error) {
+func (u *UserService) LoginUser(ctx context.Context, email, password string) (*jwt.Tokens, error) {
 
 	userByEmail, err := u.repo.GetUserByEmail(ctx, email, password)
 	if err != nil {
@@ -62,6 +62,14 @@ func (u *UserService) LoginUser(ctx context.Context, email, password string) (*d
 	if err := checkPassword(password, userByEmail.Password); err != nil {
 		return nil, err
 	}
+
+	tokens, err := u.createSession(ctx, userByEmail.ID)
+	if err != nil {
+		u.logger.Error("Failed to create session", zap.Error(err))
+		return nil, err
+	}
+
+	return &tokens, err
 
 }
 
@@ -81,28 +89,28 @@ func checkPassword(passwordLogin, passwordDB string) error {
 	return nil
 }
 
-func (s *UserService) createSession(ctx context.Context, userUUID string) (jwt.Tokens, error) {
+func (s *UserService) createSession(ctx context.Context, userID int) (jwt.Tokens, error) {
 
 	var (
-		res jwt.Tokens
-		err error
+		tokens jwt.Tokens
+		err    error
 	)
 
-	res.AccessToken, err = s.tokenManager.NewJWT(userUUID)
+	tokens.AccessToken, err = s.tokenManager.NewJWT(userID)
 	if err != nil {
-		return res, err
+		return tokens, err
 	}
 
-	res.RefreshToken, err = s.tokenManager.NewRefreshToken()
+	tokens.RefreshToken, err = s.tokenManager.NewRefreshToken()
 	if err != nil {
-		return res, err
-	}
-	session := Session{
-		UserUUID:  userUUID,
-		ExpiresAt: time.Duration(s.refreshTokenTTL) * time.Minute,
+		return tokens, err
 	}
 
-	err = s.redis.SetSession(ctx, res.RefreshToken, session)
+	expireAt := time.Duration(constants.RefreshTokenTTL) * time.Minute
 
-	return res, err
+	if err := s.redisUser.SetSession(ctx, tokens.RefreshToken, userID, expireAt); err != nil {
+		return tokens, err
+	}
+
+	return tokens, err
 }
