@@ -22,6 +22,7 @@ type UserService struct {
 
 type ServiceUser interface {
 	CreateUser(ctx context.Context, name, surname, email, password, repeatPassword string, age int) (int, error)
+	LoginUser(ctx context.Context, email, password string) (*jwt.Tokens, error)
 }
 
 func NewUserService(repo repository.StorageUser, log *zap.Logger, tokenManager jwt.TokenManager, redisUser repository.RedisStorageUser) *UserService {
