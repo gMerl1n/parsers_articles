@@ -18,5 +18,6 @@ func NewRepositories(db *pgxpool.Pool, redis *redis.Client, log *zap.Logger) *Re
 		Articles:   NewArticlesRepo(db, log),
 		Categories: NewCategoryRepo(db, log),
 		Users:      NewUserRepo(db, redis, log),
+		UserRedis:  NewRedisStoreUser(redis),
 	}
 }

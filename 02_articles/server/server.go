@@ -23,13 +23,13 @@ func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.Config
 		return nil, err
 	}
 
-	redisDB, err := redis_storage.NewRedisClient(redisConf)
+	redisClient, err := redis_storage.NewRedisClient(redisConf)
 	if err != nil {
 		log.Fatal("Failed to initialize Redis")
 		return nil, err
 	}
 
-	repo := repository.NewRepositories(db, redisDB, log)
+	repo := repository.NewRepositories(db, redisClient, log)
 	serv := service.NewServices(repo, log, tokenManager)
 	h := handlers.NewHandler(serv, log)
 

@@ -27,7 +27,8 @@ func NewRedisStoreUser(client *redis.Client) *RedisRepoUser {
 	return &RedisRepoUser{client: client}
 }
 
-func (r *RedisRepoUser) SetSession(ctx context.Context, RefreshToken string, UserID string, ExpiresAt time.Duration) error {
+func (r *RedisRepoUser) SetSession(ctx context.Context, RefreshToken string, UserID int, ExpiresAt time.Duration) error {
+
 	if err := r.client.HSet(ctx, RefreshToken, "UserID", UserID, "ExpiresAt", ExpiresAt).Err(); err != nil {
 		return err
 	}

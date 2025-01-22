@@ -41,12 +41,7 @@ func (u *UserService) CreateUser(ctx context.Context, name, surname, email, pass
 		return 0, er.PasswordRepeatedPassword
 	}
 
-	hashedPassword, err := generatePasswordHash(password)
-	if err != nil {
-		return 0, err
-	}
-
-	userID, err := u.repo.CreateUser(ctx, name, surname, email, hashedPassword, age)
+	userID, err := u.repo.CreateUser(ctx, name, surname, email, password, age)
 	if err != nil {
 		return 0, err
 	}
@@ -60,9 +55,9 @@ func (u *UserService) LoginUser(ctx context.Context, email, password string) (*j
 		return nil, err
 	}
 
-	if err := checkPassword(password, userByEmail.Password); err != nil {
-		return nil, err
-	}
+	// if err := checkPassword(password, userByEmail.Password); err != nil {
+	// 	return nil, err
+	// }
 
 	tokens, err := u.createSession(ctx, userByEmail.ID, userByEmail.RoleID)
 	if err != nil {
@@ -70,7 +65,7 @@ func (u *UserService) LoginUser(ctx context.Context, email, password string) (*j
 		return nil, err
 	}
 
-	return &tokens, err
+	return tokens, err
 
 }
 
@@ -90,7 +85,7 @@ func checkPassword(passwordLogin, passwordDB string) error {
 	return nil
 }
 
-func (s *UserService) createSession(ctx context.Context, userID, roleID int) (jwt.Tokens, error) {
+func (s *UserService) createSession(ctx context.Context, userID, roleID int) (*jwt.Tokens, error) {
 
 	var (
 		tokens jwt.Tokens
@@ -99,19 +94,19 @@ func (s *UserService) createSession(ctx context.Context, userID, roleID int) (jw
 
 	tokens.AccessToken, err = s.tokenManager.NewJWT(userID, roleID)
 	if err != nil {
-		return tokens, err
+		return nil, err
 	}
 
 	tokens.RefreshToken, err = s.tokenManager.NewRefreshToken()
 	if err != nil {
-		return tokens, err
+		return nil, err
 	}
 
 	expireAt := time.Duration(constants.RefreshTokenTTL) * time.Minute
 
 	if err := s.redisUser.SetSession(ctx, tokens.RefreshToken, userID, expireAt); err != nil {
-		return tokens, err
+		return nil, err
 	}
 
-	return tokens, err
+	return &tokens, err
 }
