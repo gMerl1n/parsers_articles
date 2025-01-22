@@ -1,0 +1,10 @@
+
+
+server:
+  port: ":8000"
+
+token:
+  jwt_secret: "3cr3t"
+  access_token_TTL: 120
+  refresh_token_TTL: 43200 // 30 days
+

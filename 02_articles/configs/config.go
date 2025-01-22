@@ -1,14 +1,19 @@
 package configs
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
+
+	"github.com/spf13/viper"
 )
 
 type Config struct {
+	Server   ConfigServer
+	Token    ConfigToken
 	Postgres ConfigPostgres
 	Redis    ConfigRedis
-	Bindaddr string
 	Loglevel string
 }
 
@@ -27,7 +32,31 @@ type ConfigRedis struct {
 	DBRedis       int
 }
 
+type ConfigServer struct {
+	Port string
+}
+
+type ConfigToken struct {
+	JWTsecret       string
+	AccessTokenTTL  int
+	RefreshTokenTTL int
+}
+
+func fetchConfig() error {
+
+	configPath := filepath.Join("configs")
+	viper.AddConfigPath(configPath)
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
+
+}
+
 func NewConfig() (*Config, error) {
+
+	if err := fetchConfig(); err != nil {
+		fmt.Printf("error initialization config %s", err.Error())
+		return nil, err
+	}
 
 	dbr, err := strconv.Atoi(os.Getenv("REDIS_DB"))
 
@@ -36,6 +65,16 @@ func NewConfig() (*Config, error) {
 	}
 
 	return &Config{
+
+		Server: ConfigServer{
+			Port: viper.GetString("server.port"),
+		},
+		Token: ConfigToken{
+			JWTsecret:       viper.GetString("token.jwt_secret"),
+			AccessTokenTTL:  viper.GetInt("token.access_token_TTL"),
+			RefreshTokenTTL: viper.GetInt("token.refresh_token_TTL"),
+		},
+
 		Postgres: ConfigPostgres{
 			User:     os.Getenv("POSTGRES_USER"),
 			NameDB:   os.Getenv("POSTGRES_DB"),
@@ -49,7 +88,6 @@ func NewConfig() (*Config, error) {
 			PasswordRedis: os.Getenv("REDIS_PASSWORD"),
 			DBRedis:       dbr,
 		},
-		Bindaddr: os.Getenv("BINDADDR"),
 		Loglevel: os.Getenv("LOGLEVEL"),
 	}, nil
 }
