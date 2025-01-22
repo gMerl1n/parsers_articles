@@ -64,7 +64,7 @@ func (u *UserService) LoginUser(ctx context.Context, email, password string) (*j
 		return nil, err
 	}
 
-	tokens, err := u.createSession(ctx, userByEmail.ID)
+	tokens, err := u.createSession(ctx, userByEmail.ID, userByEmail.RoleID)
 	if err != nil {
 		u.logger.Error("Failed to create session", zap.Error(err))
 		return nil, err
@@ -90,14 +90,14 @@ func checkPassword(passwordLogin, passwordDB string) error {
 	return nil
 }
 
-func (s *UserService) createSession(ctx context.Context, userID int) (jwt.Tokens, error) {
+func (s *UserService) createSession(ctx context.Context, userID, roleID int) (jwt.Tokens, error) {
 
 	var (
 		tokens jwt.Tokens
 		err    error
 	)
 
-	tokens.AccessToken, err = s.tokenManager.NewJWT(userID)
+	tokens.AccessToken, err = s.tokenManager.NewJWT(userID, roleID)
 	if err != nil {
 		return tokens, err
 	}

@@ -17,4 +17,5 @@ type UserByEmail struct {
 	ID       int
 	Email    string
 	Password string
+	RoleID   int
 }

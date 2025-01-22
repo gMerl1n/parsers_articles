@@ -53,9 +53,13 @@ func (u *UserRepo) GetUserByEmail(ctx context.Context, email, password string) (
 
 	var userByEmail domain.UserByEmail
 
-	query := fmt.Sprintf(`SELECT id, email, password FROM %s WHERE email = $1`, userTable)
+	query := fmt.Sprintf(`SELECT id, email, password, role_id FROM %s WHERE email = $1`, userTable)
 
-	if err := u.db.QueryRow(ctx, query, email).Scan(&userByEmail.ID, &userByEmail.Email, &userByEmail.Password); err != nil {
+	if err := u.db.QueryRow(ctx, query, email).Scan(
+		&userByEmail.ID,
+		&userByEmail.Email,
+		&userByEmail.Password,
+		&userByEmail.RoleID); err != nil {
 		return &userByEmail, er.IncorrectRequest.SetCause(fmt.Sprint(err))
 	}
 
