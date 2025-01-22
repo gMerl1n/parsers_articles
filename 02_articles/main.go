@@ -47,14 +47,14 @@ func RunServer() error {
 		log.Fatal("Failed to init config")
 	}
 
-	tokenManager, err := jwt.NewManager(constants.JWTsecret, constants.AccessTokenTTL, constants.RefreshTokenTTL)
+	tokenManager, err := jwt.NewManager(config.Token.JWTsecret, time.Duration(config.Token.AccessTokenTTL), constants.RefreshTokenTTL)
 	if err != nil {
 		log.Fatal("Failed to load JWT Token manager")
 	}
 
 	// Initialize server, db, routing
 	ctx := context.Background()
-	srv, err := server.NewHttpServer(ctx, logger, config.Postgres, config.Redis, config.Bindaddr, tokenManager)
+	srv, err := server.NewHttpServer(ctx, logger, config.Postgres, config.Redis, config.Server.Port, tokenManager)
 
 	if err != nil {
 		logger.Fatal("Failed to create HTTP server", zap.Error(err))

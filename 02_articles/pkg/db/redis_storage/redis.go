@@ -20,7 +20,3 @@ func NewRedisClient(cfg configs.ConfigRedis) (*redis.Client, error) {
 	}
 	return client, nil
 }
-
-// redis:
-//   addr_redis: "redis:6379"
-//   db_redis: "0"

@@ -20,11 +20,13 @@ func NewHttpServer(ctx context.Context, log *zap.Logger, postgres configs.Config
 	db, err := postgres_storage.NewPostgresDB(ctx, postgres)
 	if err != nil {
 		log.Fatal("Failed to initialize DB")
+		return nil, err
 	}
 
 	redisDB, err := redis_storage.NewRedisClient(redisConf)
 	if err != nil {
 		log.Fatal("Failed to initialize Redis")
+		return nil, err
 	}
 
 	repo := repository.NewRepositories(db, redisDB, log)
